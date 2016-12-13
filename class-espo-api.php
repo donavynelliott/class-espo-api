@@ -29,13 +29,17 @@ class EspoApi
     private function setHeaders($query)
     {
         //create new curl if not set;
-        $curl = (isset($this->curl)) ? $this->curl : curl_init();
-        curl_setopt($curl, CURLOPT_HEADER, false);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        $header[0] = $this->authorization;
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
-        curl_setopt($curl, CURLOPT_URL, $query . urlencode($email));
-        return $curl;
+        if (!isset($this->curl)) {
+        	$curl = curl_init();
+	        curl_setopt($curl, CURLOPT_HEADER, false);
+	        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+	        $header[0] = $this->authorization;
+	        curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
+	        curl_setopt($curl, CURLOPT_URL, $query . urlencode($email));
+	        return $curl;
+        }
+
+        return $this->curl;
     }
     
     /**
@@ -49,7 +53,7 @@ class EspoApi
     {
         $hash = "Espo-Authorization: " . base64_encode($this->username . ':' . $this->password);
         unset($username, $password);
-        return;
+        return $hash;
     }
     
     /**
@@ -62,7 +66,7 @@ class EspoApi
     public function query($entity, $params)
     {
         $params     = (gettype($params) == 'array') ? http_build_query($params) : $params;
-        $this->curl = $this->setHeaders($this->endpoint . $entity . '?' . $params);
+        $this->curl = (!isset($this->curl)) ? $this->setHeaders($this->endpoint . $entity . '?' . $params) : $this->curl;
         return json_decode(curl_exec($this->curl));
         
     }
