@@ -11,7 +11,7 @@
 class EspoApi {
 
 	// properties
-	protected $endpoint, $username, $authorization, $password, $headers, $curl;
+	protected $endpoint, $authorization, $headers, $curl;
 
 	public function __construct($domain, $username, $password) {
 		$this->endpoint = $domain . '/api/v1/';
@@ -43,9 +43,9 @@ class EspoApi {
 	 * @return string string with encoded user + pass for authorization token
 	 */
 	private function authorize($username, $password) {
-		$this->username = $username;
-		$this->password = $password;
-		return "Espo-Authorization: " . base64_encode($this->username . ':' . $this->password);
+		$hash = "Espo-Authorization: " . base64_encode($this->username . ':' . $this->password);
+		unset($username, $password);
+		return ;
 	}
 
 	/**
